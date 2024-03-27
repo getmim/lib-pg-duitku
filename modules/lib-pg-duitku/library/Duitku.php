@@ -244,4 +244,43 @@ class Duitku
         }
         return false;
     }
+
+    static function validateCallback(array $data)
+    {
+        $fields = [
+            'merchantCode',
+            'amount',
+            'merchantOrderId',
+            'resultCode',
+            'signature',
+            'reference'
+        ];
+
+        foreach ($fields as $field) {
+            if (!isset($data[$field])) {
+                return self::setError('Field `' . $field . '` is required', 400);
+            }
+        }
+
+        $config = self::getConfig();
+
+        if ($data['merchantCode'] != $config->merchantCode) {
+            return self::setError('Wrong `merchantCode`', 400);
+        }
+
+        $payload = implode('', [
+            $config->merchantCode,
+            $data['amount'],
+            $data['merchantOrderId'],
+            $config->apiKey
+        ]);
+
+        $signature = md5($payload);
+
+        if ($signature != $data['signature']) {
+            return self::setError('Bad `signature`', 400);
+        }
+
+        return $data;
+    }
 }
