@@ -1,6 +1,6 @@
 <?php
 /**
- * Duitku
+ * Payment
  * @package lib-pg-duitku
  * @version 0.0.1
  */
@@ -9,13 +9,13 @@ namespace LibPgDuitku\Library;
 
 use LibCurl\Library\Curl;
 
-class Duitku
+class Payment
 {
     protected static $error;
 
     protected static function getConfig()
     {
-        return \Mim::$app->config->libPgDuitku;
+        return \Mim::$app->config->libPgDuitku->payment;
     }
 
     static function lastError()

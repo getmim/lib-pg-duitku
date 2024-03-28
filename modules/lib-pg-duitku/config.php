@@ -2,7 +2,7 @@
 
 return [
     '__name' => 'lib-pg-duitku',
-    '__version' => '0.1.0',
+    '__version' => '0.2.0',
     '__git' => 'git@github.com:getmim/lib-pg-duitku.git',
     '__license' => 'MIT',
     '__author' => [
@@ -35,19 +35,49 @@ return [
             'name' => 'libPgDuitku',
             'children' => [
                 [
-                    'name' => 'merchantCode',
-                    'question' => 'DUITKU Merchant Code',
-                    'rule' => '!^.+$!'
+                    'name' => 'payment',
+                    'children' => [
+                        [
+                            'name' => 'merchantCode',
+                            'question' => 'DUITKU Payment Merchant Code',
+                            'rule' => '!^.+$!'
+                        ],
+                        [
+                            'name' => 'apiKey',
+                            'question' => 'DUITKU Payment API Key',
+                            'rule' => '!^.+$!'
+                        ],
+                        [
+                            'name' => 'host',
+                            'question' => 'DUITKU Payment API Hostname',
+                            'rule' => '!^.+$!'
+                        ]
+                    ]
                 ],
                 [
-                    'name' => 'apiKey',
-                    'question' => 'DUITKU API Key',
-                    'rule' => '!^.+$!'
-                ],
-                [
-                    'name' => 'host',
-                    'question' => 'DUITKU API Hostname',
-                    'rule' => '!^.+$!'
+                    'name' => 'transfer',
+                    'children' => [
+                        [
+                            'name' => 'userId',
+                            'question' => 'DUITKU Transfer User ID',
+                            'rule' => '!^.+$!'
+                        ],
+                        [
+                            'name' => 'email',
+                            'question' => 'DUITKU Transfer User Email',
+                            'rule' => '!^.+$!'
+                        ],
+                        [
+                            'name' => 'secretKey',
+                            'question' => 'DUITKU Transfer Secret Key',
+                            'rule' => '!^.+$!'
+                        ],
+                        [
+                            'name' => 'sandbox',
+                            'question' => 'DUITKU Transfer Is Sandbox',
+                            'rule' => 'boolean'
+                        ]
+                    ]
                 ]
             ]
         ]
