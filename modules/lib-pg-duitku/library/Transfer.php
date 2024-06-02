@@ -236,4 +236,55 @@ class Transfer
 
         return $res;
     }
+
+    static function getBanks()
+    {
+        $config = self::getConfig();
+        $host = self::getHost();
+        $path = '/webapi/api/disbursement/listBank';
+
+        $time = round(microtime(true) * 1000);
+
+        $body = [
+            'userId' => $config->userId,
+            'email' => $config->email,
+            'timestamp' => $time
+        ];
+
+        $payload = implode('', [
+            $body['email'],
+            $time,
+            $config->secretKey
+        ]);
+
+        $body['signature'] = hash('sha256', $payload);
+
+        $res = Curl::fetch([
+            'url' => $host . $path,
+            'method' => 'POST',
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ],
+            'body' => $body
+        ]);
+
+        if (!$res) {
+            return self::setError('Unable to reach DUITKU api');
+        }
+
+        if (is_string($res)) {
+            return self::setError($res);
+        }
+
+        if (!isset($res->responseCode) && isset($res->responseDesc)) {
+            return self::setError($res->responseDesc);
+        }
+
+        if ($res->responseCode != '00') {
+            return self::setError($res->responseDesc);
+        }
+
+        return $res;
+    }
 }
