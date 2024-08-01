@@ -2,7 +2,7 @@
 /**
  * Payment
  * @package lib-pg-duitku
- * @version 0.0.1
+ * @version 0.4.0
  */
 
 namespace LibPgDuitku\Library;
@@ -170,8 +170,10 @@ class Payment
             'signature' => $signature
         ];
 
+        $host = $config->host;
+        $url = $host . '/webapi/api/merchant/paymentmethod/getpaymentmethod';
         $res = Curl::fetch([
-            'url' => $config->host . '/webapi/api/merchant/paymentmethod/getpaymentmethod',
+            'url' => $url,
             'method' => 'POST',
             'headers' => [
                 'Content-Type' => 'application/json',

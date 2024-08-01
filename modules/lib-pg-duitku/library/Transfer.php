@@ -2,7 +2,7 @@
 /**
  * Transfer
  * @package lib-pg-duitku
- * @version 0.0.1
+ * @version 0.4.0
  */
 
 namespace LibPgDuitku\Library;
@@ -94,11 +94,14 @@ class Transfer
         return $res;
     }
 
-    static function inquiry(array $data)
+    static function inquiry(array $data, string $type='ONLINE')
     {
         $config = self::getConfig();
         $host = self::getHost();
         $path = '/webapi/api/disbursement/inquiry';
+        if ($type != 'ONLINE') {
+            $path .= 'clearing';
+        }
         if ($config->sandbox) {
             $path .= 'sandbox';
         }
@@ -107,15 +110,19 @@ class Transfer
 
         $body = [
             'userId' => $config->userId,
-            'amountTransfer' => $data['resume']['amount'],
-            'bankAccount' => $data['bank']['account']['number'],
-            'bankCode' => $data['bank']['code'],
             'email' => $config->email,
-            'purpose' => $data['info'],
-            'timestamp' => $time,
+            'bankCode' => $data['bank']['code'],
+            'bankAccount' => $data['bank']['account']['number'],
+            'amountTransfer' => $data['resume']['amount'],
+            'senderName' => $data['user']['name'],
             'senderId' => $data['user']['id'],
-            'senderName' => $data['user']['name']
+            'purpose' => $data['info'],
+            'type' => $type,
+            'timestamp' => $time
         ];
+        if (isset($data['user']['reff'])) {
+            $body['custRefNumber'] = $data['user']['reff'];
+        }
 
         $payload = implode('', [
             $body['email'],
@@ -126,6 +133,19 @@ class Transfer
             $body['purpose'],
             $config->secretKey
         ]);
+
+        if ($type != 'ONLINE') {
+            $payload = implode('', [
+                $body['email'],
+                $time,
+                $body['bankCode'],
+                $type,
+                $body['bankAccount'],
+                $body['amountTransfer'],
+                $body['purpose'],
+                $config->secretKey
+            ]);
+        }
 
         $body['signature'] = hash('sha256', $payload);
 
@@ -158,13 +178,24 @@ class Transfer
         return $res;
     }
 
+    static function bifast(array $data)
+    {
+        return self::send($data, 'BIFAST');
+    }
+
     static function online(array $data)
     {
-        $config = self::getConfig();
-        $result = self::inquiry($data);
+        return self::send($data, 'ONLINE');
+    }
+
+    static function send(array $data, string $type)
+    {
+        $result = self::inquiry($data, $type);
         if (!$result) {
             return false;
         }
+
+        $config = self::getConfig();
 
         $dist_id = $result->disburseId;
         $cust_no = $result->custRefNumber;
@@ -172,6 +203,9 @@ class Transfer
 
         $host = self::getHost();
         $path = '/webapi/api/disbursement/transfer';
+        if ($type != 'ONLINE') {
+            $path .= 'clearing';
+        }
         if ($config->sandbox) {
             $path .= 'sandbox';
         }
@@ -188,6 +222,7 @@ class Transfer
             'accountName' => $accn_nm,
             'custRefNumber' => $cust_no,
             'purpose' => $data['info'],
+            'type' => $type,
             'timestamp' => $time
         ];
 
@@ -203,6 +238,21 @@ class Transfer
             $dist_id,
             $config->secretKey
         ]);
+        if ($type != 'ONLINE') {
+            $payload = implode('', [
+                $body['email'],
+                $time,
+                $body['bankCode'],
+                $type,
+                $body['bankAccount'],
+                $accn_nm,
+                $cust_no,
+                $body['amountTransfer'],
+                $body['purpose'],
+                $dist_id,
+                $config->secretKey
+            ]);
+        }
 
         $body['signature'] = hash('sha256', $payload);
 
