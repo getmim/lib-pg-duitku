@@ -18,7 +18,7 @@ class Payment
         return \Mim::$app->config->libPgDuitku->payment;
     }
 
-    static function lastError()
+    public static function lastError()
     {
         return self::$error;
     }
@@ -29,7 +29,7 @@ class Payment
      *  total::float
      * ]
      */
-    static function createBill($data)
+    public static function createBill($data)
     {
         $config = self::getConfig();
         $time = date('Y-m-d H:i:s');
@@ -92,7 +92,7 @@ class Payment
         return $res;
     }
 
-    static function getInstruction($code)
+    public static function getInstruction($code)
     {
         $path_by_code = [
             // Virtual Account
@@ -150,7 +150,7 @@ class Payment
         return $result;
     }
 
-    static function getPaymentMethods($amount)
+    public static function getPaymentMethods($amount)
     {
         $config = self::getConfig();
         $time = date('Y-m-d H:i:s');
@@ -200,8 +200,8 @@ class Payment
 
         $result = [];
         $groupsByCode = [
-            'QRIS'            => ['SP','LQ','NQ','DQ','GQ','SQ'],
-            'Virtual Account' => ['BC','M2','VA','I1','B1','BT','A1','AG','NC','BR','M1'],
+            'QRIS'            => ['SP','LQ','NQ','DQ','GQ','SQ','IQ'],
+            'Virtual Account' => ['BC','M2','VA','I1','B1','BT','A1','AG','NC','BR','M1','BV'],
             'Retail'          => ['FT','IR'],
             'Kartu Kredit'    => ['VC'],
             'Paylater'        => ['DN','AT'],
@@ -239,7 +239,8 @@ class Payment
         return $result;
     }
 
-    static function setError(string $error, string $code = null) {
+    public static function setError(string $error, string $code = null)
+    {
         self::$error = 'PG: ' . $error;
         if ($code) {
             self::$error .= '(' . $code . ')';
@@ -247,7 +248,7 @@ class Payment
         return false;
     }
 
-    static function validateCallback(array $data)
+    public static function validateCallback(array $data)
     {
         $fields = [
             'merchantCode',
