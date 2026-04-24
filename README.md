@@ -132,6 +132,22 @@ stdClass Object
 )
 ```
 
+**getBalance()**
+
+Mengambil saldo akun
+
+```
+stdClass Object
+(
+    [userId] => 3551
+    [email] => test@chakratechnology.com
+    [balance] => 8230569411
+    [effectiveBalance] => 8230569411
+    [responseCode] => 00
+    [responseDesc] => Success
+)
+```
+
 **getBanks()**
 
 Mengambil semua daftar bank

@@ -28,12 +28,13 @@ class Transfer
         }
     }
 
-    static function lastError()
+    public static function lastError()
     {
         return self::$error;
     }
 
-    static function setError(string $error, string $code = null) {
+    public static function setError(string $error, string $code = null)
+    {
         self::$error = 'PG: ' . $error;
         if ($code) {
             self::$error .= '(' . $code . ')';
@@ -41,7 +42,7 @@ class Transfer
         return false;
     }
 
-    static function check(array $data)
+    public static function check(array $data)
     {
         $config = self::getConfig();
         $host = self::getHost();
@@ -94,7 +95,7 @@ class Transfer
         return $res;
     }
 
-    static function inquiry(array $data, string $type='ONLINE')
+    public static function inquiry(array $data, string $type = 'ONLINE')
     {
         $config = self::getConfig();
         $host = self::getHost();
@@ -178,17 +179,17 @@ class Transfer
         return $res;
     }
 
-    static function bifast(array $data)
+    public static function bifast(array $data)
     {
         return self::send($data, 'BIFAST');
     }
 
-    static function online(array $data)
+    public static function online(array $data)
     {
         return self::send($data, 'ONLINE');
     }
 
-    static function send(array $data, string $type)
+    public static function send(array $data, string $type)
     {
         $result = self::inquiry($data, $type);
         if (!$result) {
@@ -287,7 +288,58 @@ class Transfer
         return $res;
     }
 
-    static function getBanks()
+    public static function getBalance()
+    {
+        $config = self::getConfig();
+        $host = self::getHost();
+        $path = '/webapi/api/disbursement/checkbalance';
+
+        $time = round(microtime(true) * 1000);
+
+        $body = [
+            'userId' => $config->userId,
+            'email' => $config->email,
+            'timestamp' => $time
+        ];
+
+        $payload = implode('', [
+            $body['email'],
+            $time,
+            $config->secretKey
+        ]);
+
+        $body['signature'] = hash('sha256', $payload);
+
+        $res = Curl::fetch([
+            'url' => $host . $path,
+            'method' => 'POST',
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ],
+            'body' => $body
+        ]);
+
+        if (!$res) {
+            return self::setError('Unable to reach DUITKU api');
+        }
+
+        if (is_string($res)) {
+            return self::setError($res);
+        }
+
+        if (!isset($res->responseCode) && isset($res->responseDesc)) {
+            return self::setError($res->responseDesc);
+        }
+
+        if ($res->responseCode != '00') {
+            return self::setError($res->responseDesc);
+        }
+
+        return $res;
+    }
+
+    public static function getBanks()
     {
         $config = self::getConfig();
         $host = self::getHost();
