@@ -89,7 +89,7 @@ class Transfer
         }
 
         if ($res->responseCode != '00') {
-            return self::setError($res->responseDesc);
+            return self::setError($res->responseDesc, $res->responseCode);
         }
 
         return $res;
@@ -173,7 +173,7 @@ class Transfer
         }
 
         if ($res->responseCode != '00') {
-            return self::setError($res->responseDesc);
+            return self::setError($res->responseDesc, $res->responseCode);
         }
 
         return $res;
@@ -280,7 +280,7 @@ class Transfer
         }
 
         if ($res->responseCode != '00') {
-            return self::setError($res->responseDesc);
+            return self::setError($res->responseDesc, $res->responseCode);
         }
 
         $res->disburseId = $dist_id;
@@ -333,7 +333,7 @@ class Transfer
         }
 
         if ($res->responseCode != '00') {
-            return self::setError($res->responseDesc);
+            return self::setError($res->responseDesc, $res->responseCode);
         }
 
         return $res;
@@ -384,7 +384,7 @@ class Transfer
         }
 
         if ($res->responseCode != '00') {
-            return self::setError($res->responseDesc);
+            return self::setError($res->responseDesc, $res->responseCode);
         }
 
         return $res;
